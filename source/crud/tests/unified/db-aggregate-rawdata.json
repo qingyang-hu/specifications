@@ -1,0 +1,95 @@
+{
+  "description": "db-aggregate-rawdata",
+  "schemaVersion": "1.4",
+  "createEntities": [
+    {
+      "client": {
+        "id": "client0",
+        "observeEvents": [
+          "commandStartedEvent"
+        ]
+      }
+    },
+    {
+      "database": {
+        "id": "database0",
+        "client": "client0",
+        "databaseName": "db0"
+      }
+    }
+  ],
+  "tests": [
+    {
+      "description": "Aggregate with rawData option",
+      "runOnRequirements": [
+        {
+          "minServerVersion": "8.2.0",
+          "serverless": "forbid"
+        }
+      ],
+      "operations": [
+        {
+          "object": "database0",
+          "name": "aggregate",
+          "arguments": {
+            "pipeline": [],
+            "rawData": true
+          }
+        }
+      ],
+      "expectEvents": [
+        {
+          "client": "client0",
+          "events": [
+            {
+              "commandStartedEvent": {
+                "command": {
+                  "aggregate": 1,
+                  "pipeline": [],
+                  "rawData": true
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "Aggregate with rawData option on less than 8.2.0 - ignore argument",
+      "runOnRequirements": [
+        {
+          "maxServerVersion": "8.1.99",
+          "serverless": "forbid"
+        }
+      ],
+      "operations": [
+        {
+          "object": "database0",
+          "name": "aggregate",
+          "arguments": {
+            "pipeline": [],
+            "rawData": true
+          }
+        }
+      ],
+      "expectEvents": [
+        {
+          "client": "client0",
+          "events": [
+            {
+              "commandStartedEvent": {
+                "command": {
+                  "aggregate": 1,
+                  "pipeline": [],
+                  "rawData": {
+                    "$$exists": false
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
